@@ -9,6 +9,7 @@ authors = [{ name = "Zver1o7", url = "https://github.com/Zver1o7" }]
 dependencies = [
   "aiogram>=3.7,<4.0",
   "python-dotenv>=1.0,<2.0",
+  "aiosqlite>=0.20,<1.0",
 ]
 
 [tool.ruff]

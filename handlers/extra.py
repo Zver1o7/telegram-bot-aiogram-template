@@ -8,6 +8,7 @@ from aiogram.types import CallbackQuery, Message
 
 from config import Settings
 from runtime import stats
+from storage.db import Database
 
 router = Router(name="extra")
 
@@ -34,7 +35,7 @@ async def cmd_id(message: Message) -> None:
 
 
 @router.message(Command("stats"))
-async def cmd_stats(message: Message, settings: Settings) -> None:
+async def cmd_stats(message: Message, settings: Settings, db: Database) -> None:
     user = message.from_user
     if not user or user.id not in settings.admin_ids:
         await message.answer("Команда /stats доступна только администраторам.")
@@ -43,9 +44,12 @@ async def cmd_stats(message: Message, settings: Settings) -> None:
     uptime = stats.uptime_seconds()
     hours, rem = divmod(uptime, 3600)
     minutes, seconds = divmod(rem, 60)
+    db_counts = await db.counts()
     await message.answer(
-        "Статистика бота (в памяти, с момента запуска):\n"
-        f"• Аптайм: {hours:02d}:{minutes:02d}:{seconds:02d}\n"
+        "Статистика бота:\n"
+        f"• Аптайм (текущий процесс): {hours:02d}:{minutes:02d}:{seconds:02d}\n"
         f"• Сообщений обработано: {stats.messages_seen}\n"
-        f"• Callback-событий: {stats.callbacks_seen}"
+        f"• Callback-событий: {stats.callbacks_seen}\n"
+        f"• Пользователей в БД: {db_counts['users']}\n"
+        f"• Отзывов в БД: {db_counts['feedback']}"
     )

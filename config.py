@@ -26,6 +26,7 @@ class Settings:
     bot_token: str
     log_level: str = "INFO"
     admin_ids: frozenset[int] = field(default_factory=frozenset)
+    db_path: str = "data/bot.db"
 
 
 def get_settings() -> Settings:
@@ -36,4 +37,7 @@ def get_settings() -> Settings:
         )
     log_level = os.getenv("LOG_LEVEL", "INFO").strip().upper() or "INFO"
     admin_ids = _parse_admin_ids(os.getenv("ADMIN_IDS", ""))
-    return Settings(bot_token=token, log_level=log_level, admin_ids=admin_ids)
+    db_path = os.getenv("DB_PATH", "data/bot.db").strip() or "data/bot.db"
+    return Settings(
+        bot_token=token, log_level=log_level, admin_ids=admin_ids, db_path=db_path
+    )
