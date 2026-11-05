@@ -19,19 +19,24 @@ HELP_TEXT = (
     "• /start — начать работу и показать меню\n"
     "• /help — показать эту справку\n"
     "• /about — информация о шаблоне\n"
+    "• /ping — проверить задержку/связь\n"
+    "• /id — показать ваш ID и ID чата\n"
+    "• /stats — статистика (только для админов)\n"
     "• Любой другой текст — бот вернёт его в ответ"
 )
 
 ABOUT_TEXT = (
     "🤖 Telegram Bot Template\n\n"
-    "Шаблон на Python + aiogram 3.\n"
-    "Возможности: команды, меню-кнопки, эхо, конфиг через .env, Docker.\n\n"
+    "Расширенный шаблон на Python + aiogram 3.\n"
+    "Возможности: команды, reply/inline-кнопки, callback-обработчики, "
+    "эхо, конфиг через .env, Docker, базовая статистика.\n\n"
     "Автор: Zver1o7 (https://github.com/Zver1o7)"
 )
 
 ABOUT_KEYBOARD = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="Открыть репозиторий на GitHub", url=REPO_URL)]
+        [InlineKeyboardButton(text="Проверить связь", callback_data="ping:check")],
+        [InlineKeyboardButton(text="Открыть репозиторий на GitHub", url=REPO_URL)],
     ]
 )
 
