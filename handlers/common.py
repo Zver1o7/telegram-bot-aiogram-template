@@ -2,9 +2,17 @@ from __future__ import annotations
 
 from aiogram import F, Router
 from aiogram.filters import Command, CommandStart
-from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup
+from aiogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    Message,
+    ReplyKeyboardMarkup,
+)
 
 router = Router(name="common")
+
+REPO_URL = "https://github.com/Zver1o7/telegram-bot-aiogram-template"
 
 HELP_TEXT = (
     "Справка:\n"
@@ -17,8 +25,14 @@ HELP_TEXT = (
 ABOUT_TEXT = (
     "🤖 Telegram Bot Template\n\n"
     "Шаблон на Python + aiogram 3.\n"
-    "Возможности: команды, меню-кнопки, эхо, конфиг через .env, Docker.\n"
-    "Исходный код и настройка — в README проекта."
+    "Возможности: команды, меню-кнопки, эхо, конфиг через .env, Docker.\n\n"
+    "Автор: Zver1o7 (https://github.com/Zver1o7)"
+)
+
+ABOUT_KEYBOARD = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="Открыть репозиторий на GitHub", url=REPO_URL)]
+    ]
 )
 
 MAIN_KEYBOARD = ReplyKeyboardMarkup(
@@ -48,4 +62,4 @@ async def cmd_help(message: Message) -> None:
 @router.message(Command("about"))
 @router.message(F.text == "🤖 О боте")
 async def cmd_about(message: Message) -> None:
-    await message.answer(ABOUT_TEXT, reply_markup=MAIN_KEYBOARD)
+    await message.answer(ABOUT_TEXT, reply_markup=ABOUT_KEYBOARD)
