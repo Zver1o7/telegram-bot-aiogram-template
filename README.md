@@ -55,21 +55,6 @@
 └── README.md
 ```
 
-## Публикация в GitHub
-
-GitHub CLI (`gh`) не обязателен. Можно опубликовать так:
-
-1. Создайте пустой репозиторий на GitHub (без README/License, если они уже есть локально).
-2. Добавьте remote и отправьте изменения:
-
-   ```bash
-   git remote add origin https://github.com/<username>/<repo>.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-> Не коммитьте файл `.env` — в нём хранится секретный токен.
-
 ## Лицензия
 
 Проект распространяется по лицензии MIT. См. файл [LICENSE](LICENSE).
