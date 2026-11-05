@@ -47,7 +47,12 @@
 
 ```text
 .
-├── bot.py            # Точка входа и обработчики
+├── bot.py            # Точка входа: логирование, диспетчер, polling
+├── config.py         # Загрузка настроек из окружения
+├── handlers/
+│   ├── __init__.py   # Регистрация роутеров
+│   ├── common.py     # Команды /start и /help
+│   └── echo.py       # Эхо-ответ на текст
 ├── requirements.txt  # Зависимости Python
 ├── .env.example      # Пример переменных окружения
 ├── .gitignore
