@@ -4,7 +4,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import ErrorEvent
+from aiogram.types import BotCommand, BotCommandScopeDefault, ErrorEvent
 
 from config import get_settings
 from handlers import get_routers
@@ -18,6 +18,16 @@ def setup_logging() -> None:
 
 
 logger = logging.getLogger(__name__)
+
+
+BOT_COMMANDS = [
+    BotCommand(command="start", description="Начать работу с ботом"),
+    BotCommand(command="help", description="Показать справку"),
+]
+
+
+async def setup_bot_commands(bot: Bot) -> None:
+    await bot.set_my_commands(BOT_COMMANDS, scope=BotCommandScopeDefault())
 
 
 async def on_error(event: ErrorEvent) -> bool:
@@ -35,6 +45,9 @@ async def main() -> None:
 
     for router in get_routers():
         dp.include_router(router)
+
+    await setup_bot_commands(bot)
+    logger.info("Bot commands registered")
 
     logger.info("Bot starting (polling)...")
     try:
