@@ -1,6 +1,6 @@
 [project]
 name = "telegram-bot-aiogram-template"
-version = "0.1.0"
+version = "0.4.0"
 description = "Telegram bot template built with Python and aiogram 3"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -10,6 +10,7 @@ dependencies = [
   "aiogram>=3.7,<4.0",
   "python-dotenv>=1.0,<2.0",
   "aiosqlite>=0.20,<1.0",
+  "aiohttp>=3.9,<4.0",
 ]
 
 [tool.ruff]

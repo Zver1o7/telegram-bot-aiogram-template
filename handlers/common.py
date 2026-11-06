@@ -21,17 +21,20 @@ HELP_TEXT = (
     "• /about — информация о шаблоне\n"
     "• /ping — проверить задержку/связь\n"
     "• /id — показать ваш ID и ID чата\n"
+    "• /version — версия шаблона\n"
+    "• /uptime — аптайм процесса\n"
     "• /feedback — отправить отзыв (FSM-сценарий)\n"
     "• /cancel — отменить текущее действие\n"
     "• /stats — статистика (только для админов)\n"
+    "• /broadcast <текст> — рассылка (только для админов)\n"
     "• Любой другой текст — бот вернёт его в ответ"
 )
 
 ABOUT_TEXT = (
     "🤖 Telegram Bot Template\n\n"
-    "Расширенный шаблон на Python + aiogram 3.\n"
-    "Возможности: команды, reply/inline-кнопки, callback-обработчики, FSM (/feedback), "
-    "SQLite (пользователи/отзывы), эхо, конфиг через .env, Docker, статистика.\n\n"
+    "Мега-шаблон на Python + aiogram 3.\n"
+    "Возможности: команды, reply/inline-кнопки, callback, FSM (/feedback), "
+    "SQLite, анти-флуд, polling/webhook, админ-инструменты, Docker.\n\n"
     "Автор: Zver1o7 (https://github.com/Zver1o7)"
 )
 

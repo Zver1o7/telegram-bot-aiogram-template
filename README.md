@@ -1,60 +1,55 @@
 # Telegram Bot Template
 
-Расширенный шаблон Telegram-бота на Python и [aiogram 3](https://docs.aiogram.dev/).  
-Автор: [Zver1o7](https://github.com/Zver1o7)
+Расширенный (мега) шаблон Telegram-бота на Python и [aiogram 3](https://docs.aiogram.dev/).  
+Автор: [Zver1o7](https://github.com/Zver1o7) · Репозиторий: [telegram-bot-aiogram-template](https://github.com/Zver1o7/telegram-bot-aiogram-template)
 
-Репозиторий: [telegram-bot-aiogram-template](https://github.com/Zver1o7/telegram-bot-aiogram-template)
+> План и статус большого обновления (100 пунктов): [`docs/MEGA_UPDATE_100.md`](docs/MEGA_UPDATE_100.md)
 
 ## Возможности
 
-- Команды: `/start`, `/help`, `/about`, `/ping`, `/id`, `/feedback`, `/cancel`, `/stats` (для админов)
-- Кнопки быстрого меню (reply keyboard) и inline-кнопки (callback + ссылка на GitHub)
-- **FSM-сценарий**: `/feedback` собирает отзыв и сохраняет его в SQLite
-- **SQLite** (`aiosqlite`): учёт пользователей, сохранение отзывов, счётчики для `/stats`
-- Эхо-ответ на обычные текстовые сообщения
-- Регистрация команд в меню Telegram при старте
-- Конфигурация через `.env` (`BOT_TOKEN`, `LOG_LEVEL`, `ADMIN_IDS`, `DB_PATH`)
-- Статистика: аптайм текущего процесса + счётчики в памяти + данные из БД
-- Глобальная обработка ошибок с логированием и пользовательским fallback-сообщением
-- Docker / Docker Compose (с volume для данных)
-- `pyproject.toml` (метаданные, зависимости, Ruff)
+- **Команды**: `/start`, `/help`, `/about`, `/ping`, `/id`, `/version`, `/uptime`, `/feedback`, `/cancel`, `/stats` (админы), `/broadcast <текст>` (админы)
+- **UX**: reply-меню, inline-кнопки (callback + ссылка), команды в меню Telegram
+- **FSM**: сценарий обратной связи `/feedback` с отменой
+- **SQLite (`aiosqlite`)**: пользователи, отзывы, индексы, счётчики; трекинг пользователей
+- **Надёжность**: глобальная обработка ошибок, fallback-сообщение пользователю, анти-флуд (throttling middleware)
+- **Конфиг**: `.env` (`BOT_TOKEN`, `LOG_LEVEL`, `ADMIN_IDS`, `DB_PATH`, режим polling/webhook и др.)
+- **Режимы запуска**: polling (по умолчанию) или webhook (`aiohttp`)
+- **Dev/качество**: `pyproject.toml` (Ruff), базовые `unittest`-тесты, `Makefile`, CI workflow
+- **Документы**: `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`, мега-план
 
 ## Требования
 
 - Python 3.10+
 - Токен Telegram-бота от [@BotFather](https://t.me/BotFather)
 
-## Быстрый старт
+## Быстрый старт (polling)
 
-1. Склонируйте репозиторий и перейдите в папку проекта.
-2. Создайте виртуальное окружение и установите зависимости:
-
+1. Установите зависимости:
    ```bash
    python -m venv .venv
-   # Windows (PowerShell)
-   .\.venv\Scripts\Activate.ps1
-   # macOS/Linux
-   # source .venv/bin/activate
-
+   # Windows PowerShell: .\.venv\Scripts\Activate.ps1
+   # macOS/Linux: source .venv/bin/activate
    pip install -r requirements.txt
    ```
-
-3. Создайте `.env` на основе `.env.example`:
-
-   ```env
-   BOT_TOKEN=ваш_токен_от_BotFather
-   LOG_LEVEL=INFO
-   ADMIN_IDS=123456789
-   DB_PATH=data/bot.db
-   ```
-
-   `ADMIN_IDS` — необязательно: укажите свой Telegram user ID (узнать: `/id`), чтобы использовать `/stats` и получать уведомления об отзывах.
-
-4. Запустите бота:
-
+2. Создайте `.env` на основе `.env.example` и задайте `BOT_TOKEN` (опционально `ADMIN_IDS`, `LOG_LEVEL`, `DB_PATH`).
+3. Запустите:
    ```bash
    python bot.py
+   # или: make run
    ```
+
+## Webhook (опционально)
+
+Установите в `.env`:
+```env
+RUN_MODE=webhook
+WEBHOOK_BASE_URL=https://your-domain.example
+WEBHOOK_PATH=/webhook
+WEBHOOK_SECRET=long-random-secret
+APP_HOST=0.0.0.0
+APP_PORT=8080
+```
+Требуется публичный HTTPS-URL, который принимает запросы Telegram. Для локальной разработки обычно удобнее `RUN_MODE=polling`.
 
 ## Команды
 
@@ -64,63 +59,73 @@
 | `/help` | Справка |
 | `/about` | О шаблоне и ссылка на репозиторий |
 | `/ping` | Проверка ответа/задержки |
-| `/id` | Показать ваш user ID и ID чата |
-| `/feedback` | Отправить отзыв (сохраняется в SQLite) |
-| `/cancel` | Отменить текущее действие (например, ввод отзыва) |
-| `/stats` | Статистика (только для `ADMIN_IDS`) |
+| `/id` | Ваш user ID и ID чата |
+| `/version` | Версия шаблона |
+| `/uptime` | Аптайм процесса |
+| `/feedback` | Отправить отзыв (FSM, сохраняется в SQLite) |
+| `/cancel` | Отменить текущее действие |
+| `/stats` | Статистика (только `ADMIN_IDS`) |
+| `/broadcast <текст>` | Рассылка известным пользователям из БД (только `ADMIN_IDS`, с cooldown/лимитами) |
 
 ## Переменные окружения
 
-| Переменная | Обязательно | Описание |
-|---|---:|---|
-| `BOT_TOKEN` | да | Токен бота от @BotFather |
-| `LOG_LEVEL` | нет | `DEBUG`, `INFO`, `WARNING`, `ERROR` (по умолчанию `INFO`) |
-| `ADMIN_IDS` | нет | ID администраторов через запятую |
-| `DB_PATH` | нет | Путь к SQLite-файлу (по умолчанию `data/bot.db`) |
+| Переменная | По умолчанию | Описание |
+|---|---|---|
+| `BOT_TOKEN` | — | **Обязательно.** Токен от @BotFather |
+| `LOG_LEVEL` | `INFO` | Уровень логирования |
+| `ADMIN_IDS` | пусто | ID админов через запятую |
+| `DB_PATH` | `data/bot.db` | Путь к SQLite |
+| `RUN_MODE` | `polling` | `polling` или `webhook` |
+| `WEBHOOK_BASE_URL` | пусто | Базовый URL для webhook |
+| `WEBHOOK_PATH` | `/webhook` | Путь webhook |
+| `WEBHOOK_SECRET` | пусто | Секрет webhook (рекомендуется) |
+| `APP_HOST` | `0.0.0.0` | Хост HTTP-сервера (webhook) |
+| `APP_PORT` | `8080` | Порт HTTP-сервера (webhook) |
+| `THROTTLE_SECONDS` | `0.7` | Анти-флуд интервал (`0` — выкл) |
 
 ## Структура проекта
 
 ```text
 .
-├── bot.py              # Точка входа: БД, FSM storage, middleware, polling
-├── config.py           # Загрузка и валидация настроек из .env
-├── runtime.py          # Счётчики в памяти (аптайм/события)
-├── storage/
-│   ├── __init__.py
-│   └── db.py           # SQLite (aiosqlite): пользователи, отзывы
-├── handlers/
-│   ├── __init__.py     # Подключение роутеров
-│   ├── common.py       # /start, /help, /about, кнопки
-│   ├── extra.py        # /ping, /id, /stats, callback
-│   ├── feedback.py     # /feedback, /cancel, FSM
-│   └── echo.py         # Эхо-ответ на текст
-├── pyproject.toml      # Метаданные проекта и конфигурация Ruff
-├── requirements.txt    # Зависимости Python
-├── .env.example        # Пример переменных окружения
+├── bot.py                # Точка входа: lifecycle, polling/webhook
+├── config.py             # Настройки/env
+├── runtime.py            # In-memory счётчики
+├── handlers/             # Роутеры: common, extra, feedback, echo
+├── middlewares/          # Throttling и др.
+├── storage/db.py         # SQLite (aiosqlite)
+├── tests/                # Базовые тесты
+├── docs/MEGA_UPDATE_100.md
+├── pyproject.toml
+├── requirements.txt
+├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
-├── .dockerignore
-├── .gitignore
-├── LICENSE
+├── Makefile
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── SECURITY.md
 └── README.md
 ```
 
-## Запуск в Docker
+## Docker
 
-1. Создайте `.env` на основе `.env.example` и укажите `BOT_TOKEN` (и при необходимости `ADMIN_IDS`, `LOG_LEVEL`, `DB_PATH`).
-2. Запустите:
+```bash
+docker compose up --build
+```
+Каталог `./data` монтируется в `/app/data` для сохранения SQLite.
 
-   ```bash
-   docker compose up --build
-   ```
+## Разработка
 
-В `docker-compose.yml` каталог `./data` монтируется в `/app/data`, чтобы файл SQLite сохранялся между перезапусками.
+```bash
+make lint   # ruff check .
+make test   # unittest
+```
 
 ## Примечания
 
-- Счётчики сообщений/callback и аптайм в `/stats` считаются **для текущего процесса**; пользователи и отзывы хранятся в **SQLite**.
-- Не коммитьте `.env` и локальные файлы БД (`data/`, `*.db` уже в `.gitignore`).
-- Для продакшена можно заменить polling на webhook, добавить миграции БД и более строгую модель прав/администрирования.
+- In-memory счётчики/аптайм процесса сбрасываются при рестарте; пользователи и отзывы — в SQLite.
+- Не коммитьте `.env` и локальные БД (`data/`, `*.db`).
+- `/broadcast` — мощная команда: используйте только доверенным `ADMIN_IDS`.
 
 ## Автор
 
@@ -128,4 +133,4 @@
 
 ## Лицензия
 
-Проект распространяется по лицензии MIT. См. файл [LICENSE](LICENSE).
+MIT — см. [LICENSE](LICENSE).

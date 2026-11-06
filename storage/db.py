@@ -38,6 +38,12 @@ class Database:
                     )
                     """
                 )
+                await db.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_users_last_seen ON users(last_seen)"
+                )
+                await db.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at)"
+                )
                 await db.commit()
 
     async def upsert_user(
@@ -77,3 +83,14 @@ class Database:
             "users": int(users[0]) if users else 0,
             "feedback": int(feedback[0]) if feedback else 0,
         }
+
+    async def get_user_ids(self, limit: int = 1000) -> list[int]:
+        limit = max(1, min(int(limit), 5000))
+        async with self._lock:
+            async with aiosqlite.connect(self.path) as db:
+                cur = await db.execute(
+                    "SELECT user_id FROM users ORDER BY last_seen DESC LIMIT ?",
+                    (limit,),
+                )
+                rows = await cur.fetchall()
+        return [int(r[0]) for r in rows]
